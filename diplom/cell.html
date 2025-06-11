@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Клітинний автомат – активна лінія, бар'єрні лінії та середовище</title>
+  <link rel="stylesheet" href="cell.css">
+</head>
+<body>
+  <div id="mainContainer">
+    <canvas id="cellCanvas" width="600" height="600"></canvas>
+    <div class="controls">
+      <!-- Загальні параметри -->
+      <div class="control-group">
+        <h3>Загальні параметри</h3>
+        <label>Розмір клітинки (1 або 2):
+          <input type="number" id="cellSizeInput" value="2" min="1" max="2">
+        </label>
+        <button id="setCellSizeButton">Встановити розмір</button>
+        <br>
+        <label>Активна (кроків):
+          <input type="number" id="activeDurationInput" value="1" min="1">
+        </label>
+        <label>Рефрактерна (кроків):
+          <input type="number" id="refractoryDurationInput" value="1" min="1">
+        </label>
+        <label>Поріг активації (поінти):
+          <input type="number" id="thresholdPointsInput" value="3" min="1">
+        </label>
+        <br>
+        <label>Сусідніх рядів для імпульсу (1–3):
+          <input type="number" id="impulseRowsInput" value="3" min="1" max="3">
+        </label>
+        <button id="setParamsButton">Встановити параметри</button>
+        <br>
+        <div style="display: flex; gap: 5px;">
+          <button id="stepButton">Крок</button>
+          <button id="startButton">Старт</button>
+          <button id="stopButton">Стоп</button>
+        </div>
+        <label>
+          <input type="checkbox" id="reincarnationCheckbox">
+          Переродження
+        </label>
+      </div>
+      
+      <!-- Кнопки для активації розділів -->
+      <div class="control-group">
+        <h3>Меню створення</h3>
+        <button id="reverberateButton">Реверберат</button>
+        <button id="addEnvironmentButton">Створити нове середовище</button>
+      </div>
+      
+      <!-- Малювання активної лінії (приховано за замовчуванням) -->
+      <div id="activeLineGroup" class="control-group hidden">
+        <h3>Активна лінія</h3>
+        <label>Довжина активної лінії (клітин):
+          <input type="number" id="lineLengthInput" value="100" min="1">
+        </label>
+        <label>Ширина активної лінії (клітин):
+          <input type="number" id="lineWidthInput" value="3" min="1">
+        </label>
+        <button id="drawLineButton">Накреслити активну лінію</button>
+        <span class="note">(Клік по полотну створить активну лінію)</span>
+        <hr>
+        <label>Автоматичне створення бар'єрної лінії:
+          <select id="barrierModeSelect">
+            <option value="none">Немає</option>
+            <option value="single">Одинична</option>
+            <option value="double">Подвійна</option>
+          </select>
+        </label>
+        <!-- Для одиничної опції – вибір сторони -->
+        <div id="singleBarrierOptions" style="display: none;">
+          <label>Сторона:
+            <select id="singleBarrierSideSelect">
+              <option value="left">Зліва</option>
+              <option value="right">Зправа</option>
+              <option value="top">Зверху</option>
+              <option value="bottom">Знизу</option>
+            </select>
+          </label>
+        </div>
+        <!-- Для подвійної опції – вибір орієнтації -->
+        <div id="doubleBarrierOptions" style="display: none;">
+          <label>Орієнтація:
+            <select id="doubleBarrierOrientationSelect">
+              <option value="vertical">Вертикально (зліва та справа)</option>
+              <option value="horizontal">Горизонтально (зверху та знизу)</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      
+      <!-- Середовище у вигляді кола (приховано за замовчуванням) -->
+      <div id="environmentGroup" class="control-group hidden">
+        <h3>Середовище у вигляді кола</h3>
+        <label>Радіус кола (клітин):
+          <input type="number" id="circleRadiusInput" value="20" min="1">
+        </label>
+        <label>Активна у колі (кроків):
+          <input type="number" id="circleActiveInput" value="4" min="1">
+        </label>
+        <label>Рефрактерна у колі (кроків):
+          <input type="number" id="circleRefractoryInput" value="5" min="1">
+        </label>
+        <label>Спокій у колі (кроків):
+          <input type="number" id="circleRestingInput" value="1" min="1">
+        </label>
+        <button id="drawCircleButton">Накреслити коло середовища</button>
+        <span class="note">(Клік по полотну встановить центр кола)</span>
+      </div>
+    </div>
+  </div>
+  <script src="cellAutomaton.js"></script>
+  <script>
+    // Перемикаємо відображення опцій для бар'єрної лінії залежно від вибору режиму
+    document.getElementById('barrierModeSelect').addEventListener('change', function() {
+      if (this.value === "single") {
+        document.getElementById('singleBarrierOptions').style.display = "block";
+        document.getElementById('doubleBarrierOptions').style.display = "none";
+      } else if (this.value === "double") {
+        document.getElementById('singleBarrierOptions').style.display = "none";
+        document.getElementById('doubleBarrierOptions').style.display = "block";
+      } else {
+        document.getElementById('singleBarrierOptions').style.display = "none";
+        document.getElementById('doubleBarrierOptions').style.display = "none";
+      }
+    });
+
+    // Обробник кнопки "Реверберат"
+    document.getElementById('reverberateButton').addEventListener('click', function() {
+      // Показуємо групу активної лінії
+      document.getElementById('activeLineGroup').classList.remove('hidden');
+      // Ховаємо групу середовища (якщо вона була відкрита)
+      document.getElementById('environmentGroup').classList.add('hidden');
+      
+      // Встановлюємо значення з першої картинки
+      document.getElementById('lineLengthInput').value = 100;
+      document.getElementById('lineWidthInput').value = 3;
+      document.getElementById('barrierModeSelect').value = 'none';
+    });
+
+    // Обробник кнопки "Створити нове середовище"
+    document.getElementById('addEnvironmentButton').addEventListener('click', function() {
+      // Показуємо групу середовища
+      document.getElementById('environmentGroup').classList.remove('hidden');
+      // Ховаємо групу активної лінії (якщо вона була відкрита)
+      document.getElementById('activeLineGroup').classList.add('hidden');
+      
+      // Встановлюємо значення з другої картинки
+      document.getElementById('circleRadiusInput').value = 20;
+      document.getElementById('circleActiveInput').value = 4;
+      document.getElementById('circleRefractoryInput').value = 5;
+      document.getElementById('circleRestingInput').value = 1;
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      display: flex;
+      justify-content: center;
+      background-color: #f5f5f5;
+    }
+    /* Головний контейнер: полотно та панель управління справа */
+    #mainContainer {
+      display: flex;
+      align-items: flex-start;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    canvas {
+      border: 1px solid #ddd;
+      image-rendering: pixelated;
+      background-color: white;
+    }
+    .controls {
+      margin-left: 20px;
+      display: flex;
+      flex-direction: column;
+      max-width: 300px;
+    }
+    .control-group {
+      margin-bottom: 15px;
+      padding: 10px;
+      border-radius: 5px;
+      background-color: #f9f9f9;
+    }
+    .control-group h3 {
+      margin-top: 0;
+      color: #333;
+      font-size: 16px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 5px;
+    }
+    .controls label,
+    .controls button,
+    .controls input,
+    .controls select,
+    .controls span {
+      margin: 5px 0;
+      font-size: 14px;
+    }
+    .controls input[type="number"],
+    .controls select {
+      padding: 5px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      width: 100%;
+    }
+    .controls button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 14px;
+      margin: 4px 2px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+    }
+    .controls button:hover {
+      background-color: #45a049;
+    }
+    .controls button#reverberateButton {
+      background-color: #2196F3;
+    }
+    .controls button#reverberateButton:hover {
+      background-color: #0b7dda;
+    }
+    .controls button#addEnvironmentButton {
+      background-color: #ff9800;
+    }
+    .controls button#addEnvironmentButton:hover {
+      background-color: #e68a00;
+    }
+    .controls button#stopButton {
+      background-color: #f44336;
+    }
+    .controls button#stopButton:hover {
+      background-color: #da190b;
+    }
+    hr {
+      border: 0;
+      height: 1px;
+      background-color: #ddd;
+      margin: 10px 0;
+    }
+    .note {
+      font-size: 12px;
+      color: #666;
+      font-style: italic;
+    }
+    .hidden {
+      display: none;
+    }
